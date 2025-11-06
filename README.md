@@ -1,6 +1,9 @@
 // Account abstraction - anything can be made into a wallet.
 // EIP-4337, activated in March 2023, uses EntryPoint.sol as a standardized contract to handle UserOperations (a pseudo-transaction type)
-// EIP-7702 (May 2025) operates without requiring external infrastructure like bundlers or a separate mempool, unlike EIP-4337
+// EIP-7702 (May 2025) operates without requiring external infrastructure like bundlers or a separate mempool, unlike EIP-4337. It's purpose is to simplify account abstraction for Externally owned addresses only.
 // While EIP-7702 reduces reliance on EIP-4337 for certain account abstraction use cases, EntryPoint.sol and EIP-4337 remain valuable for scenarios requiring more complex or persistent smart contract wallet functionality.
 // EIP-7702 only enables temporary delegation of Externally Owned Address (EOA) behavior to smart contract logic for a single transaction.
 // EIP-7702 and EIP-4337 are designed to coexist. EIP-7702 handles native, EOA-based AA, while EIP-4337 supports full smart contract wallets and complex transaction flows. The Ethereum Foundation and EIP authors (e.g., Vitalik Buterin) have emphasized that EIP-7702 enhances, rather than replaces, EIP-4337.
+// Signature Aggregators addon allows definition a group of signatures to be added (multi-sig).
+// Pay master addon allows for sponsorship of the alt-memepool gas fees. Without a paymaster, the on-chain contract associated with the EIP-4337 account will need to have enough ETH to pay for the gas.
+// In zkSync the alt-memepool capability is coded into the a standard zksync node. This makes the zkSync nodes capable of natively supporting account abstraction. (Ever.y single account in zkSync uses the DefaultAccount smart contract )
