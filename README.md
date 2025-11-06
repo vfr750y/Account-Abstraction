@@ -6,4 +6,4 @@
 // EIP-7702 and EIP-4337 are designed to coexist. EIP-7702 handles native, EOA-based AA, while EIP-4337 supports full smart contract wallets and complex transaction flows. The Ethereum Foundation and EIP authors (e.g., Vitalik Buterin) have emphasized that EIP-7702 enhances, rather than replaces, EIP-4337.
 // Signature Aggregators addon allows definition a group of signatures to be added (multi-sig).
 // Pay master addon allows for sponsorship of the alt-memepool gas fees. Without a paymaster, the on-chain contract associated with the EIP-4337 account will need to have enough ETH to pay for the gas.
-// In zkSync the alt-memepool capability is coded into the a standard zksync node. This makes the zkSync nodes capable of natively supporting account abstraction. (Ever.y single account in zkSync uses the DefaultAccount smart contract )
+// In zkSync the alt-memepool capability is coded into the a standard zksync node. Use transaction type 113. This makes the zkSync nodes capable of natively supporting account abstraction. (Every single account in zkSync uses the DefaultAccount smart contract )
