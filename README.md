@@ -12,6 +12,25 @@ In zkSync the alt-memepool capability is coded into the a standard zksync node. 
 
 # Project Overview
 
+
 1. Create a basic Account Abstraction on Ethereum.
+    https://eips.ethereum.org/EIPS/eip-4337
+    The user operation contains the full data that needs to be sent to the Alt-memepool.
+    The EntryPoint interface is a packed version of the UserOperation (packedUserOperation) that is passed to the on-chain EntryPoint contract, account and Paymaster.
+    The EntryPoint.sol contract contains a function called handleOps which takes a PackedUserOperation array and a payable address
+    The PackedUserOperation.sol interface contains a struct called PackedUserOperation containing the parameters for the PackedUserOperation array:
+    - sender	address	 
+    - nonce	uint256	 
+    - initCode	bytes	concatenation of factory address and factoryData (or empty), or EIP-7702 data
+    - callData	bytes	 
+    - accountGasLimits	bytes32	concatenation of verificationGasLimit (16 bytes) and callGasLimit (16 bytes)
+    - preVerificationGas	uint256	 
+    - gasFees	bytes32	concatenation of maxPriorityFeePerGas (16 bytes) and maxFeePerGas (16 bytes)
+    - paymasterAndData	bytes	concatenation of paymaster fields (or empty)
+    - signature	bytes
+    The Account Contract Interface (IAccount) is the core interface for an account.
+   It contains the validateUserOp function which returns a uint256
+   If the UserOperation is valid the user Account contract will allow the Alt-memepool to send the transaction on behalf of the account.
+
 2. Create a basic Account Abstraction on zkSync
 3. Deploy and send a userOp / transaction through each of them.
