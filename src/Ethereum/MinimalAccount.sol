@@ -10,10 +10,22 @@ import {SIG_VALIDATION_FAILED, SIG_VALIDATION_SUCCESS} from "lib/account-abstrac
 import {IEntryPoint} from "lib/account-abstraction/contracts/interfaces/IEntryPoint.sol";
 
 contract MinimalAccount is IAccount, Ownable {
+    /*/////////////////////////////////////////////////////////////
+                    Errors
+    ////////////////////////////////////////////////////////////*/
     error MinimalAccount__NotFromEntryPoint();
+    error MinimalAccount__NotFromEntryPointOrOwner();
+    error MinimalAccount__CallFailed(bytes);
+
+    /*/////////////////////////////////////////////////////////////
+                    State Variables
+    ///////////////////////////////////////////////////////////*/
 
     IEntryPoint private immutable i_entryPoint;
 
+    /*/////////////////////////////////////////////////////////////
+                    Modifiers
+    ///////////////////////////////////////////////////////////*/
     modifier requireFromEntryPoint() {
         if (msg.sender != address(i_entryPoint)) {
             revert MinimalAccount__NotFromEntryPoint();
@@ -21,9 +33,23 @@ contract MinimalAccount is IAccount, Ownable {
         _;
     }
 
+    modifier requireFromEntryPointOrOwner() {
+        if (msg.sender != address(i_entryPoint) && msg.sender != owner()) {
+            revert MinimalAccount__NotFromEntryPointOrOwner();
+        }
+        _;
+    }
+
+    /*/////////////////////////////////////////////////////////////
+                   Functions
+    ///////////////////////////////////////////////////////////*/
+
     constructor(address entryPoint) Ownable(msg.sender) {
         i_entryPoint = IEntryPoint(entryPoint);
     }
+    /*/////////////////////////////////////////////////////////////
+                    External Functions
+    ////////////////////////////////////////////////////////////*/
 
     // Signature validation criteria can be anything. In this simple example, as signature is valid if it is the account owner. This allows the smart contract wallet holder to transfer to a different owner without revealing the private key.The owner of the contract needs to be the signer of the PackedUserOperation calldata.
 
@@ -36,6 +62,16 @@ contract MinimalAccount is IAccount, Ownable {
         validationData = _validateSignature(userOp, userOpHash);
         // missingAccountFunds denotes how much the transaction costs and the amount payable to whoever sent the transaction (i.e. the entrypoint contract)
         _payPrefund(missingAccountFunds);
+    }
+
+    /*/////////////////////////////////////////////////////////////
+                    Internal Functions
+    ////////////////////////////////////////////////////////////*/
+    function execute(address dest, uint256 value, bytes calldata functionData) external requireFromEntryPoint {
+        (bool success, bytes memory result) = dest.call{value: value}(functionData);
+        if (!success) {
+            revert MinimalAccount__CallFailed(result);
+        }
     }
 
     // EIP-191 version of the signed hash needs to be converted into a standard keccak256 hash
