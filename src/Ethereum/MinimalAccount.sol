@@ -10,10 +10,10 @@ import {SIG_VALIDATION_FAILED, SIG_VALIDATION_SUCCESS} from "lib/account-abstrac
 import {IEntryPoint} from "lib/account-abstraction/contracts/interfaces/IEntryPoint.sol";
 
 contract MinimalAccount is IAccount, Ownable {
-    address private immutable i_entryPoint;
+    IEntryPoint private immutable i_entryPoint;
 
     constructor(address entryPoint) Ownable(msg.sender) {
-        i_entryPoint = entryPoint;
+        i_entryPoint = IEntryPoint(entryPoint);
     }
 
     // Signature validation criteria can be anything. In this simple example, as signature is valid if it is the account owner. This allows the smart contract wallet holder to transfer to a different owner without revealing the private key.The owner of the contract needs to be the signer of the PackedUserOperation calldata.
@@ -48,6 +48,13 @@ contract MinimalAccount is IAccount, Ownable {
             (bool success,) = payable(msg.sender).call{value: missingAccountFunds, gas: type(uint256).max}("");
             (success);
         }
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                        Getter Functions
+    ///////////////////////////////////////////////////////////////*/
+    function getEntryPoint() external view returns (address) {
+        return address(i_entryPoint);
     }
 }
 
