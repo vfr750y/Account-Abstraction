@@ -7,9 +7,14 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {MessageHashUtils} from "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import {SIG_VALIDATION_FAILED, SIG_VALIDATION_SUCCESS} from "lib/account-abstraction/contracts/core/Helpers.sol";
+import {IEntryPoint} from "lib/account-abstraction/contracts/interfaces/IEntryPoint.sol";
 
 contract MinimalAccount is IAccount, Ownable {
-    constructor() Ownable(msg.sender) {}
+    address private immutable i_entryPoint;
+
+    constructor(address entryPoint) Ownable(msg.sender) {
+        i_entryPoint = entryPoint;
+    }
 
     // Signature validation criteria can be anything. In this simple example, as signature is valid if it is the account owner. This allows the smart contract wallet holder to transfer to a different owner without revealing the private key.The owner of the contract needs to be the signer of the PackedUserOperation calldata.
 
