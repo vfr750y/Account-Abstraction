@@ -47,6 +47,8 @@ contract MinimalAccount is IAccount, Ownable {
     constructor(address entryPoint) Ownable(msg.sender) {
         i_entryPoint = IEntryPoint(entryPoint);
     }
+
+    receive() external payable {}
     /*/////////////////////////////////////////////////////////////
                     External Functions
     ////////////////////////////////////////////////////////////*/
@@ -64,15 +66,16 @@ contract MinimalAccount is IAccount, Ownable {
         _payPrefund(missingAccountFunds);
     }
 
-    /*/////////////////////////////////////////////////////////////
-                    Internal Functions
-    ////////////////////////////////////////////////////////////*/
     function execute(address dest, uint256 value, bytes calldata functionData) external requireFromEntryPoint {
         (bool success, bytes memory result) = dest.call{value: value}(functionData);
         if (!success) {
             revert MinimalAccount__CallFailed(result);
         }
     }
+
+    /*/////////////////////////////////////////////////////////////
+                    Internal Functions
+    ////////////////////////////////////////////////////////////*/
 
     // EIP-191 version of the signed hash needs to be converted into a standard keccak256 hash
     function _validateSignature(PackedUserOperation calldata userOp, bytes32 userOpHash)
