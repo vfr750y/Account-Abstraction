@@ -52,4 +52,12 @@ contract MinimalAccountTest is Test {
         minimalAccount.execute(dest, value, functionData);
         //
     }
+
+    function testRecoverSignedOp() public view {
+        // Arrange
+
+        // Act
+
+        // Assert
+    }
 }
