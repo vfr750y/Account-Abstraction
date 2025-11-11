@@ -2,17 +2,24 @@
 pragma solidity ^0.8.24;
 import {Script} from "forge-std/Script.sol";
 import {PackedUserOperation} from "lib/account-abstraction/contracts/interfaces/PackedUserOperation.sol";
+import {HelperConfig} from "../script/HelperConfig.s.sol";
+import {IEntryPoint} from "lib/account-abstraction/contracts/interfaces/IEntryPoint.sol";
 
 contract SendPackedUserOp is Script {
     function run() public {}
 
-    function generateSignedUserOperation(bytes memory callData, address sender)
-        public
-        returns (PackedUserOperation memory)
-    {
-        uint256 nonce = vm.getNonce(sender);
+    function generateSignedUserOperation(
+        bytes memory callData,
+        address sender,
+        HelperConfig.NetworkConfig memory config
+    ) public returns (PackedUserOperation memory) {
+        // 1. Generate the unsigned data
+        uint256 nonce = vm.getNonce(config.account);
 
-        PackedUserOperation memory unsignedUserOp = _generateUnsignedUserOperation(callData, sender, nonce);
+        PackedUserOperation memory unsignedUserOp = _generateUnsignedUserOperation(callData, config.account, nonce);
+
+        // 2. Get the userOp Hash
+        bytes32 userOpHash = IEntryPoint(config.entryPoint).getUserOpHash(unsignedUserOp);
     }
 
     function _generateUnsignedUserOperation(bytes memory callData, address sender, uint256 nonce)
