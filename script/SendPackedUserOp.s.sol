@@ -24,6 +24,8 @@ contract SendPackedUserOp is Script {
         bytes32 digest = userOpHash.toEthSignedMessageHash();
 
         // 3. Sign it
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(config.account, digest);
+        unsignedUserOp.signature = abi.encodePacked(r, s, v);
     }
 
     function _generateUnsignedUserOperation(bytes memory callData, address sender, uint256 nonce)
