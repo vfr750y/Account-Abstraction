@@ -5,11 +5,13 @@ import {MinimalAccount} from "../../src/Ethereum/MinimalAccount.sol";
 import {DeployMinimal} from "../../script/DeployMinimal.s.sol";
 import {HelperConfig} from "script/HelperConfig.s.sol";
 import {ERC20Mock} from "@openzeppelin/contracts/mocks/token/ERC20Mock.sol";
+import {SendPackedUserOp} from "../../script/SendPackedUserOp.s.sol";
 
 contract MinimalAccountTest is Test {
     HelperConfig helperConfig;
     MinimalAccount minimalAccount;
     ERC20Mock usdc;
+    SendPackedUserOp sendPackedUserOp;
 
     address randomuser = makeAddr("randomUser");
     uint256 constant AMOUNT = 1e18;
