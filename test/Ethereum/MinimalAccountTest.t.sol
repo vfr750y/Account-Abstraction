@@ -55,6 +55,10 @@ contract MinimalAccountTest is Test {
 
     function testRecoverSignedOp() public view {
         // Arrange
+        assertEq(usdc.balanceOf(address(minimalAccount)), 0);
+        address dest = address(usdc);
+        uint256 value = 0;
+        bytes memory functionData = abi.encodeWithSelector(ERC20Mock.mint.selector, address(minimalAccount), AMOUNT);
 
         // Act
 
