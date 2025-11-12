@@ -25,7 +25,7 @@ contract MinimalAccountTest is Test {
         DeployMinimal deployMinimal = new DeployMinimal();
         (helperConfig, minimalAccount) = deployMinimal.deployMinimalAccount();
         usdc = new ERC20Mock();
-        SendPackedUserOp sendPackedUserOp = new SendPackedUserOp();
+        sendPackedUserOp = new SendPackedUserOp();
     }
 
     // USDC mint test - the msg.sender -> Minimal Account
