@@ -7,8 +7,12 @@ import {HelperConfig} from "script/HelperConfig.s.sol";
 import {ERC20Mock} from "@openzeppelin/contracts/mocks/token/ERC20Mock.sol";
 import {SendPackedUserOp} from "../../script/SendPackedUserOp.s.sol";
 import {PackedUserOperation} from "lib/account-abstraction/contracts/interfaces/PackedUserOperation.sol";
+import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import {MessageHashUtils} from "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
+import {IEntryPoint} from "lib/account-abstraction/contracts/interfaces/IEntryPoint.sol";
 
 contract MinimalAccountTest is Test {
+    using MessageHashUtils for bytes32;
     HelperConfig helperConfig;
     MinimalAccount minimalAccount;
     ERC20Mock usdc;
@@ -65,8 +69,11 @@ contract MinimalAccountTest is Test {
             abi.encodeWithSelector(minimalAccount.execute.selector, dest, value, functionData);
         PackedUserOperation memory packedUserOp =
             sendPackedUserOp.generateSignedUserOperation(executeCallData, helperConfig.getConfig());
-        // Act
+        bytes32 userOperationHash = IEntryPoint(helperConfig.getConfig().entryPoint).getUserOpHash(packedUserOp);
 
+        // Act
+        address actualSigner = ECDSA.recover(userOperationHash.toEthSignedMessageHash(), packedUserOp.signature);
         // Assert
+        assertEq(actualSigner, minimalAccount.owner());
     }
 }
