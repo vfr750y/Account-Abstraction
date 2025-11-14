@@ -104,7 +104,7 @@ contract MinimalAccountTest is Test {
             abi.encodeWithSelector(minimalAccount.execute.selector, dest, value, functionData);
         PackedUserOperation memory packedUserOp =
             sendPackedUserOp.generateSignedUserOperation(executeCallData, helperConfig.getConfig());
-        bytes32 userOperationHash = IEntryPoint(helperConfig.getConfig().entryPoint).getUserOpHash(packedUserOp);
+        // bytes32 userOperationHash = IEntryPoint(helperConfig.getConfig().entryPoint).getUserOpHash(packedUserOp);
         vm.deal(address(minimalAccount), 1e18);
         PackedUserOperation[] memory ops = new PackedUserOperation[](1);
         ops[0] = packedUserOp;
