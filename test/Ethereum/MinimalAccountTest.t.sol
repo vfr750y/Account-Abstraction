@@ -106,10 +106,14 @@ contract MinimalAccountTest is Test {
             sendPackedUserOp.generateSignedUserOperation(executeCallData, helperConfig.getConfig());
         bytes32 userOperationHash = IEntryPoint(helperConfig.getConfig().entryPoint).getUserOpHash(packedUserOp);
         vm.deal(address(minimalAccount), 1e18);
-        PackedUserOperation[] memory ops = new PackesUserOperation[](1);
+        PackedUserOperation[] memory ops = new PackedUserOperation[](1);
+        ops[0] = packedUserOp;
 
         // Act
         vm.prank(randomuser);
-        IEntryPoint(helperConfig.getConfig().entryPpoint).handleOps();
+        IEntryPoint(helperConfig.getConfig().entryPoint).handleOps(ops, payable(randomuser));
+
+        // Assert
+        assertEq(usdc.balanceOf(address(minimalAccount)), AMOUNT);
     }
 }
