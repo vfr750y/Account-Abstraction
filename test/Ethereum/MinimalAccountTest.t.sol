@@ -105,7 +105,11 @@ contract MinimalAccountTest is Test {
         PackedUserOperation memory packedUserOp =
             sendPackedUserOp.generateSignedUserOperation(executeCallData, helperConfig.getConfig());
         bytes32 userOperationHash = IEntryPoint(helperConfig.getConfig().entryPoint).getUserOpHash(packedUserOp);
+        vm.deal(address(minimalAccount), 1e18);
+        PackedUserOperation[] memory ops = new PackesUserOperation[](1);
 
         // Act
+        vm.prank(randomuser);
+        IEntryPoint(helperConfig.getConfig().entryPpoint).handleOps();
     }
 }
