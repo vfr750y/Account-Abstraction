@@ -1,36 +1,183 @@
-# About
+Here's a comprehensive, professional-grade **README.md** for your Solidity project:
 
-Account abstraction - anything can be made into a wallet.
-EIP-4337, activated in March 2023, uses EntryPoint.sol as a standardized contract to handle UserOperations (a pseudo-transaction type)
-EIP-7702 (May 2025) operates without requiring external infrastructure like bundlers or a separate mempool, unlike EIP-4337. It's purpose is to simplify account abstraction for Externally owned addresses only.
-While EIP-7702 reduces reliance on EIP-4337 for certain account abstraction use cases, EntryPoint.sol and EIP-4337 remain valuable for scenarios requiring more complex or persistent smart contract wallet functionality.
-EIP-7702 only enables temporary delegation of Externally Owned Address (EOA) behavior to smart contract logic for a single transaction.
-EIP-7702 and EIP-4337 are designed to coexist. EIP-7702 handles native, EOA-based AA, while EIP-4337 supports full smart contract wallets and complex transaction flows. The Ethereum Foundation and EIP authors (e.g., Vitalik Buterin) have emphasized that EIP-7702 enhances, rather than replaces, EIP-4337.
-Signature Aggregators addon allows definition a group of signatures to be added (multi-sig).
-Pay master addon allows for sponsorship of the alt-memepool gas fees. Without a paymaster, the on-chain contract associated with the EIP-4337 account will need to have enough ETH to pay for the gas.
-In zkSync the alt-memepool capability is coded into the a standard zksync node. Use transaction type 113. This makes the zkSync nodes capable of natively supporting account abstraction. (Every single account in zkSync uses the DefaultAccount smart contract ).
+```markdown
+# Minimal Account - ERC-4337 & zkSync Native Account Abstraction Implementation
 
-# Project Overview
+A minimal, secure, and well-tested implementation of **ERC-4337 compatible smart contract accounts** (for EVM chains) and **native Account Abstraction on zkSync Era**, built with **Foundry**.
 
+This project demonstrates two production-ready minimal account implementations:
 
-1. Create a basic Account Abstraction on Ethereum.
-    https://eips.ethereum.org/EIPS/eip-4337
-    The user operation contains the full data that needs to be sent to the Alt-memepool.
-    The EntryPoint interface is a packed version of the UserOperation (packedUserOperation) that is passed to the on-chain EntryPoint contract, account and Paymaster.
-    The EntryPoint.sol contract contains a function called handleOps which takes a PackedUserOperation array and a payable address
-    The PackedUserOperation.sol interface contains a struct called PackedUserOperation containing the parameters for the PackedUserOperation array:
-    - sender	address	 
-    - nonce	uint256	 
-    - initCode	bytes	concatenation of factory address and factoryData (or empty), or EIP-7702 data
-    - callData	bytes	 
-    - accountGasLimits	bytes32	concatenation of verificationGasLimit (16 bytes) and callGasLimit (16 bytes)
-    - preVerificationGas	uint256	 
-    - gasFees	bytes32	concatenation of maxPriorityFeePerGas (16 bytes) and maxFeePerGas (16 bytes)
-    - paymasterAndData	bytes	concatenation of paymaster fields (or empty)
-    - signature	bytes
-    The Account Contract Interface (IAccount) is the core interface for an account.
-   It contains the validateUserOp function which returns a uint256
-   If the UserOperation is valid the user Account contract will allow the Alt-memepool to send the transaction on behalf of the account.
+- `MinimalAccount.sol` → Standard ERC-4337 account (EIP-4337) for Ethereum, Sepolia, Arbitrum, etc.
+- `ZkMinimalAccount.sol` → Native AA smart account for **zkSync Era** (using type 113 transactions)
 
-2. Create a basic Account Abstraction on zkSync
-3. Deploy and send a userOp / transaction through each of them.
+Both accounts are owned by an EOA and support signature validation via `eth_sign` (EIP-191), enabling gasless or sponsored transactions via bundlers and paymasters.
+
+---
+
+### Features
+
+- ERC-4337 Compatible Smart Contract Wallet (`MinimalAccount`)
+- Native zkSync Era Account Abstraction Support (`ZkMinimalAccount`)
+- Owner-based signature validation (simple & secure)
+- Full test suite using Foundry
+- Multi-chain deployment scripts (Mainnet, Sepolia, Anvil, Arbitrum)
+- Mock token interaction examples (USDC approve/mint)
+- Clean separation of concerns with `HelperConfig`
+- Uses OpenZeppelin and official Account Abstraction contracts
+
+---
+
+### Project Structure
+
+```
+src/
+├── Ethereum/MinimalAccount.sol          # ERC-4337 Minimal Account
+├── zksync/ZkMinimalAccount.sol          # zkSync Native AA Account
+script/
+├── DeployMinimal.s.sol                  # Deployment script
+├── SendPackedUserOp.s.sol               # Sends a UserOperation via EntryPoint
+├── HelperConfig.s.sol                   # Chain-specific config (EntryPoint, accounts)
+test/
+├── MinimalAccountTest.t.sol             # Foundry tests for EVM chains
+└── zkMinimalAccountTest.t.sol           # Tests for zkSync (requires --zk-sync flag)
+```
+
+---
+
+### Prerequisites
+
+- [Foundry](https://github.com/foundry-rs/foundry) (`forge`, `cast`, `anvil`)
+- Node.js (for `forge install` dependencies)
+
+```bash
+curl -L https://foundry.paradigm.xyz | bash
+foundryup
+```
+
+---
+
+### Installation
+
+```bash
+git clone https://github.com/yourusername/minimal-account-aa.git
+cd minimal-account-aa
+forge install
+```
+
+Dependencies included via submodules:
+- `account-abstraction` (ERC-4337 contracts)
+- `foundry-era-contracts` (zkSync system contracts)
+- `foundry-devops` (deployment tools)
+- OpenZeppelin Contracts
+
+---
+
+### Testing
+
+#### Standard EVM Chains (Anvil, Sepolia, etc.)
+
+```bash
+forge test
+```
+
+#### zkSync Era Tests (Local Node Required)
+
+Start a zkSync local node first (in Docker):
+
+```bash
+# In a separate terminal
+docker run --rm -it -p 3311:3311 -p 3060:3060 matterlabs/local-node
+```
+
+Then run zkSync-specific tests:
+
+```bash
+forge test --zk-sync -vv
+```
+
+> Note: Use `--system-mode=true` if testing full bootloader interaction.
+
+---
+
+### Deployment
+
+#### 1. Deploy on Anvil (Local)
+
+```bash
+# Start anvil
+anvil
+
+# Deploy in another terminal
+forge script script/DeployMinimal.s.sol:DeployMinimal --rpc-url http://localhost:8545 --broadcast
+```
+
+#### 2. Deploy on Sepolia / Mainnet
+
+Update `BURNER_WALLET` in `HelperConfig.s.sol` to your funded address.
+
+```bash
+forge script script/DeployMinimal.s.sol:DeployMinimal \
+  --rpc-url $SEPOLIA_RPC_URL \
+  --account "deployer" \
+  --broadcast \
+  --verify \
+  --etherscan-api-key $ETHERSCAN_KEY
+```
+
+---
+
+### Send a User Operation (ERC-4337)
+
+After deploying the `MinimalAccount`, run:
+
+```bash
+forge script script/SendPackedUserOp.s.sol:SendPackedUserOp \
+  --rpc-url http://localhost:8545 \
+  --broadcast
+```
+
+This script:
+- Signs a `PackedUserOperation`
+- Submits it via `EntryPoint.handleOps()`
+- Approves 1e18 USDC to a random address (as an example action)
+
+Works locally on Anvil and on real ERC-4337 chains (Sepolia, etc.)
+
+---
+
+### Key Design Decisions
+
+| Feature                        | Implementation Detail                                                                 |
+|-------------------------------|---------------------------------------------------------------------------------------|
+| Signature Validation          | Owner signs `toEthSignedMessageHash(userOpHash)` → standard `eth_sign` compatible     |
+| Access Control                | Only EntryPoint or Owner can call `execute()`                                         |
+| Prefund Payment               | Automatically pays missing funds to EntryPoint during validation                     |
+| zkSync Native AA              | Uses `validateTransaction`, increments nonce via `NonceHolder`, pays bootloader       |
+| Gas Limits                    | Hardcoded safe defaults (can be upgraded later)                                       |
+
+---
+
+### Security Considerations
+
+- Uses battle-tested OpenZeppelin `Ownable` and `ECDSA`
+- Reverts on failed calls with data (`CallFailed(bytes)`)
+- Proper access control via modifiers
+- No external calls in signature validation (view function)
+- Supports account recovery by transferring ownership
+
+---
+
+### Resources
+
+- ERC-4337 Spec: https://eips.ethereum.org/EIPS/eip-4337
+- zkSync Account Abstraction Docs: https://era.zksync.io/docs/
+- EntryPoint Address (v0.7): `0x0000000071727De22E5E9d8BAf0edAc6f37da032`
+- Foundry Book: https://book.getfoundry.sh/
+
+---
+
+### License
+
+MIT License
+
+---
