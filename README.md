@@ -1,6 +1,4 @@
-Here's a comprehensive, professional-grade **README.md** for your Solidity project:
 
-```markdown
 # Minimal Account - ERC-4337 & zkSync Native Account Abstraction Implementation
 
 A minimal, secure, and well-tested implementation of **ERC-4337 compatible smart contract accounts** (for EVM chains) and **native Account Abstraction on zkSync Era**, built with **Foundry**.
