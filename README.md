@@ -1,7 +1,7 @@
 
 # Minimal Account - ERC-4337 & zkSync Native Account Abstraction Implementation
 
-A minimal, secure, and well-tested implementation of **ERC-4337 compatible smart contract accounts** (for EVM chains) and **native Account Abstraction on zkSync Era**, built with **Foundry**.
+A minimal, secure, and tested implementation of **ERC-4337 compatible smart contract accounts** (for EVM chains) and **native Account Abstraction on zkSync Era**, built with **Foundry**.
 
 This project demonstrates two production-ready minimal account implementations:
 
@@ -157,7 +157,7 @@ Works locally on Anvil and on real ERC-4337 chains (Sepolia, etc.)
 
 ### Security Considerations
 
-- Uses battle-tested OpenZeppelin `Ownable` and `ECDSA`
+- Uses OpenZeppelin `Ownable` and `ECDSA`
 - Reverts on failed calls with data (`CallFailed(bytes)`)
 - Proper access control via modifiers
 - No external calls in signature validation (view function)
